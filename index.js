@@ -24,7 +24,9 @@ function createSlimPreprocessor(config, logger) {
 
   if(typeof(config.slimrbOption) === 'string') {
     log.debug('Passing args to slim command (%s).', config.slimrbOption);
-    slimCommandArgs.push(config.slimrbOption);
+    var option = config.slimrbOption;
+    var index = option.indexOf(' ');
+    slimCommandArgs = slimCommandArgs.concat([option.substr(0,index), option.substr(index + 1)]);
   }
 
   return function(content, file, done) {
@@ -34,7 +36,7 @@ function createSlimPreprocessor(config, logger) {
 
     path = file.originalPath;
     html = '';
-    child = spawn(slimCommandAbsolute, slimCommandArgs.concat(path));
+    child = spawn(slimCommandAbsolute, [path].concat(slimCommandArgs));
 
     // Handle an error from stderr, which would be a slim syntax error
     child.stderr.on('data', function (buf) {
